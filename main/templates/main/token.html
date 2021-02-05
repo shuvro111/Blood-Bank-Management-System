@@ -1,0 +1,26 @@
+{% load static %}
+
+<link rel="stylesheet" type="text/css" href="{% static 'css/style.css' %}">
+
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+
+<body">
+
+    <div class="w-full h-screen flex flex-wrap justify-center align-center content-center  bg-pink-100">
+        <div class="w-1/2 h-1/2  bg-gray-100 flex flex-col justify-center items-center  rounded-md shadow-lg">
+            <h1 class="w-full font-sans text-center text-3xl m-2">You Have Been Registered Sucessfully!</h1>
+            <p class="w-full font-sans text-center text-md ">A link has been sent to your mail. Please click the link
+                and verify your account. </p>
+            <a class="w-max bg-red-500 hover:bg-red-600 duration-300 text-center text-white my-10  px-6 py-3 rounded-md" href="{% url 'log__in' %}">Back to login</a>
+        </div>
+    </div>
+</body>
+
+</html>
