@@ -11,8 +11,20 @@
     <title>Document</title>
 </head>
 
-<body">
+<body>
 
+    {% if messages %}
+    <div class="bg-red-200 text-red-700 px-6 py-4 rounded-lg relative mb-5" role="alert" x-data="{ open: true }" x-show.transition="open">
+
+        {% for message in messages %}
+            <div class="single-message">
+                {{ message }}
+            </div>
+        {% endfor %}
+    </div>
+    {% endif %}
+
+    
     <div class="w-full h-screen flex flex-wrap justify-center align-center content-center  bg-pink-100">
         <div class="w-1/2 h-1/2  bg-gray-100 flex flex-col justify-center items-center  rounded-md shadow-lg">
             <h1 class="w-full font-sans text-center text-3xl m-2">You Have Been Registered Sucessfully!</h1>

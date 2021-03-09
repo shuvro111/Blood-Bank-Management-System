@@ -1,0 +1,22 @@
+input[type=file]::file-selector-button {
+    padding: .3em .6em;
+    border-radius: .2em;
+    border: none;
+    background-color: #EF4444;
+    color: #FFFFFF;
+    transition: 1s;
+  }
+
+.form-wrapper{
+  box-shadow: 0 6px 16px 0 rgba(0,0,0,.2);
+}
+
+.active{
+  background-color: white;
+  /* box-shadow: 0px -16px 16px 0 rgba(0,0,0,.2); */
+  z-index: 9;
+}
+
+.invisible{
+  display: none;
+}
