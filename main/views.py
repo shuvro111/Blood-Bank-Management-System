@@ -3,10 +3,6 @@ from django.contrib import messages
 import uuid
 from .models import *
 
-from django.contrib.auth.decorators import login_required
-from django.urls import reverse
-from django.http import HttpResponseRedirect
-
 # Send Mail
 from django.conf import settings
 from django.core.mail import send_mail
@@ -17,11 +13,33 @@ from .forms import UserForm, LoginForm
 #Hashing & Salting
 from passlib.hash import pbkdf2_sha256
 
+
+# Decorators
+
+def login__required(f):
+    def wrap(request, *args, **kwargs):
+        #this check the session if userid key exist, if not it will redirect to login page
+        if 'email' not in request.session.keys():
+            messages.error(request, 'You are not logged in :/')
+            return redirect("/login")
+        return f(request, *args, **kwargs)
+    wrap.__doc__=f.__doc__
+    wrap.__name__=f.__name__
+    return wrap
+
+
+
+
+
 # Views
 
 
 def index(request):
-    return render(request, 'main/index.html')
+    if 'email' not in request.session.keys():
+        return render(request, 'main/index.html')
+    else:
+        return redirect('/dashboard')
+    
 
 
 def create__account(request):
@@ -96,19 +114,16 @@ def log__in(request):
             if not is_valid_user:
                 messages.error(request, 'Wrong password!')
                 return redirect('/login')
+            else:
+                #set_session / authorized login
+                set_session(request, user_obj.id, user_obj.user_name, user_obj.email)
+                return redirect('/dashboard')
             
-            #set_session / authorized login
-            set_session(request, user_obj.user_name, user_obj.email)
-            # if request.GET.get('next', None):
-            #     return HttpResponseRedirect(request.GET['next'])
-            # return HttpResponseRedirect(reverse('dashboard'))
-
-            return redirect('/dashboard')
 
     return render(request, 'main/log__in.html', {'form' : form})
 
 
-# @login_required(login_url='/login')
+@login__required
 def log__out(request):
     request.session.flush()
     return redirect('/')
@@ -122,7 +137,8 @@ def success(request):
 
 def error_page(request):
     return render(request, 'main/error.html')
-# @login_required(login_url='/login')
+
+@login__required
 def dashboard(request):
     return render(request, 'main/dashboard.html')
 
@@ -159,6 +175,8 @@ def verify(request , auth_token):
         return redirect('/')
 
 
-def set_session(request, username, email):
-    request.session['username'] = username
+def set_session(request, user_id, user_name, email):
+    request.session['user_id'] = user_id
+    request.session['user_name'] = user_name
     request.session['email'] = email
+
