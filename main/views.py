@@ -1,17 +1,21 @@
 from django.shortcuts import render, redirect
 from django.contrib import messages
+from django.shortcuts import get_list_or_404, get_object_or_404
 import uuid
-from .models import *
 
 # Send Mail
 from django.conf import settings
 from django.core.mail import send_mail
 
-# Forms
-from .forms import UserForm, LoginForm
-
 #Hashing & Salting
 from passlib.hash import pbkdf2_sha256
+
+#Models
+from .models import *
+
+# Forms
+from .forms import UserForm, LoginForm, UserUpdateForm, DonorUpdateForm
+
 
 
 # Decorators
@@ -38,8 +42,8 @@ def index(request):
     if 'email' not in request.session.keys():
         return render(request, 'main/index.html')
     else:
-        return redirect('/dashboard')
-    
+        return redirect('dashboard')
+
 
 
 def create__account(request):
@@ -65,14 +69,25 @@ def create__account(request):
             nid_image = form.cleaned_data.get('nid_image')
             is_donor = form.cleaned_data.get('is_donor')
 
+            print("is donor is", is_donor)
+
             auth_token = str(uuid.uuid4())
 
-            if User.objects.filter(email=email).first():
+            #Check if account exists
+            user_obj = User.objects.filter(email=email).first()
+
+            if user_obj:
                 messages.error(request, 'This email is already registered')
                 return redirect('/token')
             else:
-                new__user = User.objects.create(user_name=user_name, email=email, password=hashed_password, city=city, mobile_no=mobile_no, blood_group=blood_group, gender=gender, date_of_birth=date_of_birth, nid_image=nid_image, is_donor=is_donor, auth_token=auth_token)
-                new__user.save()
+                new__user = User.objects.create(user_name=user_name, email=email, password=hashed_password, auth_token=auth_token)
+
+                if is_donor:
+                    new__donor = Donor.objects.create(is_donor = is_donor, user = new__user, city=city, mobile_no=mobile_no, blood_group=blood_group, gender=gender, date_of_birth=date_of_birth, nid_image=nid_image)
+                    new__donor.save()
+                else:
+                    new__user.save()
+   
                 registration_mail(email, auth_token)
                 return redirect('/token')
         else:
@@ -83,50 +98,127 @@ def create__account(request):
 
 def log__in(request):
 
-    form = LoginForm()
+    if 'email' in request.session.keys():
+        return redirect('/dashboard')
 
-    if request.method == "POST":
-        form = LoginForm(request.POST)
+    else:
+        form = LoginForm()
 
-        if form.is_valid():
-            #Form Data
-            email = form.cleaned_data.get('email')
-            password = form.cleaned_data.get('password')
-            
-            #User Object from database
-            user_obj = User.objects.filter(email=email).first()
+        if request.method == "POST":
+            form = LoginForm(request.POST)
 
-            #Check If User Exists
-            if user_obj is None:
-                messages.error(request, 'User not found.')
-                return redirect('/login')
+            if form.is_valid():
+                #Form Data
+                email = form.cleaned_data.get('email')
+                password = form.cleaned_data.get('password')
+                
+                #User Object from database
+                user_obj = User.objects.filter(email=email).first()
 
-            #Check Verified User
-            if not user_obj.is_verified:
-                messages.error(request, 'Profile is not verified check your mail.')
-                return redirect('/login')
+                #Check If User Exists
+                if user_obj is None:
+                    messages.error(request, 'User not found.')
+                    return redirect('/login')
 
-            #Check Password
-            hashed_password = user_obj.password
-            is_valid_user = pbkdf2_sha256.verify(password, hashed_password)
+                
+                if user_obj:
 
-            #Case: Invalid Password
-            if not is_valid_user:
-                messages.error(request, 'Wrong password!')
-                return redirect('/login')
-            else:
-                #set_session / authorized login
-                set_session(request, user_obj.id, user_obj.user_name, user_obj.email)
-                return redirect('/dashboard')
-            
+                    #Check Verified User
 
-    return render(request, 'main/log__in.html', {'form' : form})
+                    if not user_obj.is_verified:
+                        messages.error(request, 'Profile is not verified check your mail.')
+                        return redirect('/login')
+                        
+                    #Check Password
+                    hashed_password = user_obj.password
+                    is_valid_user = pbkdf2_sha256.verify(password, hashed_password)
+
+                    #Case: Invalid Password
+                    if not is_valid_user:
+                        messages.error(request, 'Wrong password!')
+                        return redirect('/login')
+                    else:                  
+                        #check if donor or user
+                        is_donor = hasattr(user_obj, 'donor')
+
+                        if is_donor:
+                            #set_session / authorized login
+                            set_session(request, user_obj.id, user_obj.user_name, user_obj.email, 'true')
+                        else:
+                            #set_session / authorized login
+                            set_session(request, user_obj.id, user_obj.user_name, user_obj.email, 'false')
+
+                        return redirect('/dashboard')
+
+
+                
+
+        return render(request, 'main/log__in.html', {'form' : form})
 
 
 @login__required
 def log__out(request):
     request.session.flush()
     return redirect('/')
+
+
+@login__required
+def edit__profile(request):
+    
+    id = request.session['user_id']
+    # user_obj = get_object_or_404(User, pk=id)
+    user_obj = User.objects.get(pk=id)
+    is_donor = hasattr(user_obj, 'donor')
+
+    form = UserUpdateForm(request.POST or None, instance = user_obj)
+    if is_donor:
+        donor_obj = Donor.objects.filter(user = user_obj).first()
+        print(donor_obj.user_id)
+        donor_form = DonorUpdateForm(request.POST or None, instance = donor_obj)
+
+    if request.method == "POST":
+        
+
+        if form.is_valid():
+            print("Form is valid")
+            user_name = form.cleaned_data.get('user_name')
+            user_obj.user_name = user_name
+            user_obj.save()
+
+    if request.method == "POST":
+        print("POST METHOD Received")
+        if is_donor:
+            print(donor_form.errors)
+            if donor_form.is_valid():
+
+                
+                city = donor_form.cleaned_data.get('city')
+                mobile_no = donor_form.cleaned_data.get('mobile_no')
+                gender = donor_form.cleaned_data.get('gender')
+                date_of_birth = donor_form.cleaned_data.get('date_of_birth')
+
+                # donor_obj.user = user_obj
+                print(city)
+                donor_obj.city = city
+                donor_obj.mobile_no = mobile_no
+                donor_obj.gender = gender
+                donor_obj.date_of_birth = date_of_birth
+                
+                donor_obj.save()
+                print('donor object saved')
+        
+        messages.success(request, 'Profile has been updated!') 
+        return redirect('/dashboard')
+
+    else:
+        if is_donor:
+            return render(request, 'main/edit_profile.html', {'form' : form, 'donor_form' : donor_form})
+        else:
+            return render(request, 'main/edit_profile.html', {'form' : form})        
+
+    
+
+
 
 def token__send(request):
     return render(request, 'main/token.html')
@@ -140,8 +232,10 @@ def error_page(request):
 
 @login__required
 def dashboard(request):
-    return render(request, 'main/dashboard.html')
-
+    if request.session['is_donor'] == 'true':
+        return render(request, 'main/donor_dashboard.html')
+    else:
+        return render(request, 'main/user_dashboard.html')
 
 # Functions
 
@@ -175,8 +269,9 @@ def verify(request , auth_token):
         return redirect('/')
 
 
-def set_session(request, user_id, user_name, email):
+def set_session(request, user_id, user_name, email, donor_status):
     request.session['user_id'] = user_id
     request.session['user_name'] = user_name
     request.session['email'] = email
+    request.session['is_donor'] = donor_status
 

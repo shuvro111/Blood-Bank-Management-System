@@ -168,24 +168,24 @@
         }
 
 
-      let register = document.getElementById('register')
-      let register_as_donor = document.getElementById('register_as_donor')
-      let register_content = document.getElementById('register-content')
-      let register_as_donor_content = document.getElementById('register-as-donor-content')
+        let register = document.getElementById('register')
+        let register_as_donor = document.getElementById('register_as_donor')
+        let register_content = document.getElementById('register-content')
+        let register_as_donor_content = document.getElementById('register-as-donor-content')
 
-      register.addEventListener('click', function(){
-        register.classList.add('active');
-        register_as_donor.classList.remove('active');
-        register_content.classList.remove('invisible');
-        register_as_donor_content.classList.add('invisible');
-      });
+        register.addEventListener('click', function(){
+            register.classList.add('active');
+            register_as_donor.classList.remove('active');
+            register_content.classList.remove('invisible');
+            register_as_donor_content.classList.add('invisible');
+        });
 
-      register_as_donor.addEventListener('click', function(){
-        register_as_donor.classList.add('active');
-        register.classList.remove('active');
-        register_content.classList.add('invisible');
-        register_as_donor_content.classList.remove('invisible');
-      });
+        register_as_donor.addEventListener('click', function(){
+            register_as_donor.classList.add('active');
+            register.classList.remove('active');
+            register_content.classList.add('invisible');
+            register_as_donor_content.classList.remove('invisible');
+        });
     
     </script>    
 

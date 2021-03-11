@@ -1,0 +1,119 @@
+{% load static %}
+
+<link rel="stylesheet" type="text/css" href="{% static 'css/style.css' %}">
+<link rel="stylesheet" type="text/css" href="{% static 'css/custom.css' %}">
+<!DOCTYPE html>
+<html>
+
+<head>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width">
+	<title>Edit Profile- Blood Bank Management System</title>
+	<link rel="stylesheet" href="/build/tailwind.css" type="text/css" media="screen" title="no title" charset="utf-8" />
+</head>
+
+<body class>
+	<div class="w-full h-full bg-white">
+		<div class="h-full flex flex-col justify-center items-center">
+
+			<img class="w-24 mb-12" src="/static/assets/img/logo.png">
+
+			<div class="form-wrapper w-1/4 rounded-md">
+				<h2 class="text-center text-3xl font-bold text-gray-700 mt-8">Edit Profile</h2>
+				<div class="p-8">
+					
+					{% if messages %}
+					<div class="bg-red-200 text-red-700 px-6 py-4 rounded-lg relative mb-5" role="alert" x-data="{ open: true }" x-show.transition="open">
+
+						{% for message in messages %}
+							<div class="single-message">
+								{{ message }}
+							</div>
+						{% endfor %}
+					</div>
+					{% endif %}
+
+
+					{% if request.session.is_donor == 'true' %}
+					
+						<form method="POST" enctype="multipart/form-data">
+
+							{% csrf_token %}
+
+							<div class="mb-4">
+								<label class="text-xs font-bold text-gray-700">Name</label>
+								{{form.user_name}}
+								{{form.user_name.errors}}
+							</div>
+							
+							<div class="mb-4">
+								<label class="text-xs font-bold text-gray-700">City</label>  
+								{{donor_form.city}}
+								{{donor_form.city.errors}}
+							</div class="mb-4">
+								
+							<div class="mb-4">
+								<label class="text-xs font-bold text-gray-700">Mobile No +880</label>  
+								{{donor_form.mobile_no}}
+								{{donor_form.mobile_no.errors}}
+								<p id="mobile_error" class="mt-2 text-red-700 text-xs font-bold">Please Enter Valid Number</p>
+							</div>
+
+							<div class="flex mb-4">
+								<div>
+									<label class="text-xs font-bold text-gray-700 mb-1">Blood Group</label>  
+									{{donor_form.blood_group}}
+									{{donor_form.blood_group.errors}}
+								</div>
+
+								<div class="ml-12">
+									<label class="text-xs font-bold text-gray-700 mb-1">Gender</label>  
+									{{donor_form.gender}}
+									{{donor_form.gender.errors}}
+								</div>                        
+							</div>
+
+							<div class="">
+								<label class="block text-xs font-bold text-gray-700">Date of Birth</label>  
+									{{donor_form.date_of_birth}}
+									{{donor_form.date_of_birth.errors}}
+							</div>
+
+							<div class="mt-10">
+								<button type="submit" class="bg-red-500 ease-in-out duration-300 text-gray-100 p-4 w-full rounded-md font-bold"> Update Profile </button>
+							</div>
+
+							<div
+								class="mt-10 text-sm ease-in-out duration-300 font-display font-semibold text-gray-700 text-center">
+								Didn't meant to edit profile? <a class="cursor-pointer text-red-600 hover:text-red-800" href="{% url 'dashboard' %}"> Fly to dashboard</a>
+							</div>
+						</form>
+						
+					{% else %}	
+						<form method="POST" enctype="multipart/form-data">
+
+							{% csrf_token %}
+
+							<div class="mb-4">
+								<label class="text-xs font-bold text-gray-700">Name</label>
+								{{form.user_name}}
+								{{form.user_name.errors}}
+							</div>
+
+							<div class="mt-10">
+								<button type="submit" class="bg-red-500 ease-in-out duration-300 text-gray-100 p-4 w-full rounded-md font-bold"> Update Profile </button>
+							</div>
+
+							<div
+								class="mt-10 text-sm ease-in-out duration-300 font-display font-semibold text-gray-700 text-center">
+								Didn't meant to edit profile? <a class="cursor-pointer text-red-600 hover:text-red-800" href="{% url 'dashboard' %}"> Fly to dashboard</a>
+							</div>
+						</form>
+					{% endif %}
+				</div>
+			</div>
+		</div>
+	</div>	
+</body>
+
+</html>

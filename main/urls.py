@@ -10,6 +10,7 @@ urlpatterns = [
     path('error' , views.error_page , name="error"),
     path('login/', views.log__in, name = 'log__in'),
     path('logout/', views.log__out, name = 'log__out'),
+    path('user/profile/edit/', views.edit__profile, name = 'edit__profile'),
     path('token/', views.token__send, name = 'token__send'),
     path('success/', views.success, name = 'success'),
     path('dashboard/', views.dashboard, name = 'dashboard'),
