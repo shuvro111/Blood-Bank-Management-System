@@ -14,4 +14,5 @@ urlpatterns = [
     path('token/', views.token__send, name = 'token__send'),
     path('success/', views.success, name = 'success'),
     path('dashboard/', views.dashboard, name = 'dashboard'),
+    path('donors/', views.view__donors, name = 'view__donors'),
 ]

@@ -57,3 +57,6 @@ class Donor(models.Model):
 
 
 
+# class  Bookmark(models.Model):
+#     donor = models.OneToOneField("Donor", on_delete=models.CASCADE)
+#     user = models.ManyToManyField("User")

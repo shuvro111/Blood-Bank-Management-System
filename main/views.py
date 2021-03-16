@@ -12,6 +12,7 @@ from passlib.hash import pbkdf2_sha256
 
 #Models
 from .models import *
+from bookmark.models import *
 
 # Forms
 from .forms import UserForm, LoginForm, UserUpdateForm, DonorUpdateForm
@@ -218,6 +219,17 @@ def edit__profile(request):
 
     
 
+def view__donors(request):
+    donors = Donor.objects.all()
+    
+    id = request.session['user_id']
+    user_obj = User.objects.get(pk=id)
+    bookmarks = Bookmark.objects.filter(client = user_obj)
+
+    # donor_id = request.POST['donor_id']
+    # donor_obj = Donor.objects.get(pk=donor_id)
+
+    return render(request, 'main/view_donors.html', {'donors' : donors, 'bookmarks' : bookmarks})
 
 
 def token__send(request):

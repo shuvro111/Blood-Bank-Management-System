@@ -42,7 +42,8 @@ INSTALLED_APPS = [
     'django.contrib.sites',
 
     #Custom Apps
-    'main'
+    'main',
+    'bookmark'
 ]
 
 SITE_ID = 1
