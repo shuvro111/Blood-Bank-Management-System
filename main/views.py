@@ -218,7 +218,7 @@ def edit__profile(request):
             return render(request, 'main/edit_profile.html', {'form' : form})        
 
     
-
+@login__required
 def view__donors(request):
     donors = Donor.objects.all()
     
@@ -229,7 +229,7 @@ def view__donors(request):
     # donor_id = request.POST['donor_id']
     # donor_obj = Donor.objects.get(pk=donor_id)
 
-    return render(request, 'main/view_donors.html', {'donors' : donors, 'bookmarks' : bookmarks})
+    return render(request, 'main/view_donors.html', {'donors' : donors, 'bookmarks' : bookmarks, 'bookmarked' : 'False'})
 
 
 def token__send(request):

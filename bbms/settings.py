@@ -43,7 +43,8 @@ INSTALLED_APPS = [
 
     #Custom Apps
     'main',
-    'bookmark'
+    'bookmark',
+    'blood_bank'
 ]
 
 SITE_ID = 1

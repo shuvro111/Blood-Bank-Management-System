@@ -1,0 +1,81 @@
+{% load static %}
+
+<link rel="stylesheet" type="text/css" href="{% static 'css/style.css' %}">
+<link rel="stylesheet" type="text/css" href="{% static 'css/custom.css' %}">
+<!DOCTYPE html>
+<html>
+
+<head>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width">
+	<title>Add Blood - Inventory</title>
+	<link rel="stylesheet" href="/build/tailwind.css" type="text/css" media="screen" title="no title" charset="utf-8" />
+</head>
+
+<body class>
+	<div class="w-full h-full bg-white">
+		<div class="h-full flex flex-col justify-center items-center">
+
+			<img class="w-24 mb-12" src="/static/assets/img/logo.png">
+
+			<div class="form-wrapper w-1/4 rounded-md">
+				<h2 class="text-center text-3xl font-bold text-gray-700 mt-8">Add Blood</h2>
+				<div class="p-8">
+					
+					{% if messages %}
+					<div class="bg-red-200 text-red-700 px-6 py-4 rounded-lg relative mb-5" role="alert" x-data="{ open: true }" x-show.transition="open">
+
+						{% for message in messages %}
+							<div class="single-message">
+								{{ message }}
+							</div>
+						{% endfor %}
+					</div>
+					{% endif %}
+
+
+					<form method="POST" enctype="multipart/form-data">
+
+						{% csrf_token %}
+
+						<div class="mb-4">
+							<label class="text-xs font-bold text-gray-700">Blood Group</label>
+							{{form.blood_group}}
+							{{form.blood_group.errors}}
+						</div>
+
+						<div class="mb-4">
+							<label class="text-xs font-bold text-gray-700">Donor's Name</label>
+							{{form.donor_name}}
+							{{form.donor_name.errors}}
+						</div>
+
+						<div class="mb-4">
+							<label class="text-xs font-bold text-gray-700">Donor's Mobile No</label>
+							{{form.donor_mobile_no}}
+							{{form.donor_mobile_no.errors}}
+						</div>
+
+						<div class="mb-4">
+							<label class="text-xs font-bold text-gray-700">Donation Date</label><br>
+							{{form.donation_date}}
+							{{form.donation_date.errors}}
+						</div>
+
+						<div class="mt-10">
+							<button type="submit" class="bg-red-500 ease-in-out duration-300 text-gray-100 p-4 w-full rounded-md font-bold"> Add Blood </button>
+						</div>
+
+						<div
+							class="mt-10 text-sm ease-in-out duration-300 font-display font-semibold text-gray-700 text-center">
+							Didn't mean to add blood ? <a class="cursor-pointer text-red-600 hover:text-red-800" href="/inventory">Go Back</a>
+						</div>
+
+					</form>
+				</div>
+			</div>
+		</div>
+	</div>	
+</body>
+
+</html>
