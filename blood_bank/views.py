@@ -77,12 +77,17 @@ def login__as__operator(request):
 # View Inventory
 @login__required
 @is_operator
-def view__inventory(request, page_number):
+def view__inventory(request):
     bloodbank_id = request.session['bloodbank_id']
     inventory = Inventory.objects.filter(blood_bank_id = bloodbank_id).order_by('-donation_date')
 
     paginator = Paginator(inventory, 15) # Show 25 contacts per page.
-    page_obj = paginator.page(page_number) #get single page results
+    page_number = request.GET.get('page', 1)
+    try:
+        page_obj = paginator.page(page_number)
+    except EmptyPage:
+        page_obj = paginator.page(1)
+     #get single page results
     total_items = paginator.count
     single_page_items = page_obj.count
 
@@ -158,9 +163,10 @@ def edit__blood(request,blood_id):
 def delete__blood(request,blood_id):
     blood_obj = Inventory.objects.get(pk=blood_id)
 
-
-    messages.success(request, 'Blood Deleted Succesfully!')
-    blood_obj.delete()
+    if request.method == "POST":
+        blood_obj.delete()
+        messages.success(request, 'Blood Deleted Succesfully!')
+        return redirect('/inventory')
 
     return render(request, 'main/delete_blood.html')
     

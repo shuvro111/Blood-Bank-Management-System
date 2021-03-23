@@ -8,7 +8,7 @@
 </head>
 <body>
     <h1>Are You Sure to Delete?</h1>
-    <button onclick="window.location.href='/inventory'">YES</button>
-    <button type="submit" formmethod="post" onclick="window.location.href='/inventory'">NO</button>
+    <form method="POST">{% csrf_token %}<button type="submit">YES</button></form>
+    <button onclick="window.location.href='/inventory'">NO</button>
 </body>
 </html>
