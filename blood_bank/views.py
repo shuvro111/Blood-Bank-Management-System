@@ -1,5 +1,6 @@
 from django.shortcuts import render, redirect
 from django.contrib import messages
+from django.core.paginator import Paginator
 
 # Models
 from .models import *
@@ -69,17 +70,24 @@ def login__as__operator(request):
                         set_session(request, operator_obj.id, operator_obj.name, operator_obj.operator_email, 'true')
                         return redirect('/inventory')
 
-    return render(request, 'main/log__in.html', {'form' : form})
+    return render(request, 'main/operator__login.html', {'form' : form})
 
 
 
 # View Inventory
 @login__required
 @is_operator
-def view__inventory(request):
+def view__inventory(request, page_number):
     bloodbank_id = request.session['bloodbank_id']
-    inventory = Inventory.objects.filter(blood_bank_id = bloodbank_id)
-    return render(request, 'main/view_inventory.html', {'inventory' : inventory})
+    inventory = Inventory.objects.filter(blood_bank_id = bloodbank_id).order_by('-donation_date')
+
+    paginator = Paginator(inventory, 15) # Show 25 contacts per page.
+    page_obj = paginator.page(page_number) #get single page results
+    total_items = paginator.count
+    single_page_items = page_obj.count
+
+
+    return render(request, 'main/view_inventory.html', {'page_obj' : page_obj})
 
 
 # Add Blood

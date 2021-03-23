@@ -1,0 +1,68 @@
+{% load static %}
+
+<link rel="stylesheet" type="text/css" href="{% static 'css/style.css' %}">
+<link rel="stylesheet" type="text/css" href="{% static 'css/custom.css' %}">
+<!DOCTYPE html>
+<html>
+
+<head>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width">
+	<title>Operator Login - Blood Bank Management System</title>
+	<link rel="stylesheet" href="/build/tailwind.css" type="text/css" media="screen" title="no title" charset="utf-8" />
+</head>
+
+<body class>
+	<div class="w-full h-full bg-white">
+		<div class="h-full flex flex-col justify-center items-center">
+
+			<img class="w-24 mb-12" src="/static/assets/img/logo.png">
+
+			<div class="form-wrapper w-1/4 rounded-md">
+				<h2 class="text-center text-3xl font-bold text-gray-700 mt-8">Operator Login</h2>
+				<div class="p-8">
+					
+					{% if messages %}
+					<div class="bg-red-200 text-red-700 px-6 py-4 rounded-lg relative mb-5" role="alert" x-data="{ open: true }" x-show.transition="open">
+
+						{% for message in messages %}
+							<div class="single-message">
+								{{ message }}
+							</div>
+						{% endfor %}
+					</div>
+					{% endif %}
+
+
+					<form method="POST" enctype="multipart/form-data">
+
+						{% csrf_token %}
+
+						<div class="mb-4">
+							<label class="text-xs font-bold text-gray-700">Email</label>
+							{{form.email}}
+							{{form.email.errors}}
+						</div>
+
+						<div class="mb-4">
+							<label class="text-xs font-bold text-gray-700">Password</label>
+							{{form.password}}
+							{{form.password.errors}}
+						</div>
+
+						<div class="mt-10">
+							<button type="submit" class="bg-red-500 ease-in-out duration-300 text-gray-100 p-4 w-full rounded-md font-bold"> Log in </button>
+						</div>
+
+					</form>
+				</div>
+			</div>
+		</div>
+	</div>	
+
+
+
+
+</body>
+
+</html>
