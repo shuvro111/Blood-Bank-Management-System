@@ -7,8 +7,17 @@ name = "pypi"
 django = "*"
 passlib = "*"
 pillow = "*"
+django-suit = "==0.2.25"
+install = "*"
+django-nucleus = "*"
+geopy = "*"
+geoip2 = "*"
+requests = "*"
 
 [dev-packages]
 
 [requires]
 python_version = "3.8"
+
+[packages.6210100]
+file = "https://github.com/darklow/django-suit/tarball/v2"

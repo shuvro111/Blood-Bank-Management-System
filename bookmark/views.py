@@ -31,3 +31,23 @@ def add__bookmarks(request):
         bookmark.client.add(user_obj)
         bookmark.save()
         return redirect('/donors')
+
+
+def remove__bookmarks(request):
+    if request.method == "POST":
+        id = request.session['user_id']
+        donor_id = request.POST['donor_id']
+        user_obj = User.objects.get(pk=id)
+        donor_obj = Donor.objects.get(pk=donor_id)
+        
+        if Bookmark.objects.filter(donor = donor_obj).first(): 
+            bookmark = Bookmark.objects.filter(donor = donor_obj).first()
+            bookmark.client.remove(user_obj)
+
+            client = bookmark.client.all()
+
+            if not client.exists():
+                bookmark.delete()
+        return redirect('/donors')
+
+

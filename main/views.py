@@ -2,6 +2,7 @@ from django.shortcuts import render, redirect
 from django.contrib import messages
 from django.shortcuts import get_list_or_404, get_object_or_404
 import uuid
+import socket
 
 # Send Mail
 from django.conf import settings
@@ -16,6 +17,10 @@ from bookmark.models import *
 
 # Forms
 from .forms import UserForm, LoginForm, UserUpdateForm, DonorUpdateForm
+
+#geolocation
+from .utils import get_location, get_destination, get_distance
+import requests
 
 
 
@@ -231,6 +236,37 @@ def view__donors(request):
 
     return render(request, 'main/view_donors.html', {'donors' : donors, 'bookmarks' : bookmarks, 'bookmarked' : 'False'})
 
+
+@login__required
+def sort_by_nearest(request):
+
+    #get donors
+    donors = Donor.objects.all()
+    distances = {}
+    #get ip from socket module
+    hostname = socket.gethostname()
+    #ip_address = socket.gethostbyname(hostname)
+    my_ip_address = '103.54.150.241'
+
+    #get user location by ip_address
+    location = get_location(my_ip_address)
+    
+    for donor in donors:
+        #get donors location by city
+        city = donor.city
+        destination = get_destination(city)
+
+        #find distance from user --> donor
+        response = requests.get("https://api.distancematrix.ai/maps/api/distancematrix/json?origins=23.8759,90.3795&destinations=Rangpur, Dhaka, Bangladesh&key=040gMYB28CrmN0oCgVtDawyZLdfIJ")
+        data = response.json()
+        distance = data['rows'][0]['elements'][0]['distance']['text']
+        print(distance)
+        # distances[donor].append(distance)
+
+    # distances.sort()
+    print(distances)
+    distances.clear()
+    return render(request, 'main/view_donors.html', {'distances': distances})
 
 def token__send(request):
     return render(request, 'main/token.html')

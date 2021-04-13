@@ -78,8 +78,10 @@
                     <tr class="text-sm leading-4 text-red-700 text-left uppercase tracking-wider border-gray-300">
                         <th class="px-6 py-3 border-b-2">Blood Group</th>
                         <th class="px-6 py-3 border-b-2">Donor Name</th>
+                        <th class="px-6 py-3 border-b-2">Donor's Address</th>
                         <th class="px-6 py-3 border-b-2">Donor's Mobile No.</th>
                         <th class="px-6 py-3 border-b-2">Donation Date</th>
+                        <th class="px-6 py-3 border-b-2">Expiry Date</th>
                         <th class="px-6 py-3 border-b-2">Action</th>
                     </tr>
                 </thead>
@@ -90,8 +92,10 @@
                                 <div class="text-sm leading-5 text-gray-900">{{blood.blood_group}}</div>
                             </td>
                             <td class="px-6 py-4 whitespace-no-wrap border-b text-gray-900 border-gray-500 text-sm leading-5">{{blood.donor_name}}</td>
+                            <td class="px-6 py-4 whitespace-no-wrap border-b text-gray-900 border-gray-500 text-sm leading-none"> {{blood.donor_address}} </td>
                             <td class="px-6 py-4 whitespace-no-wrap border-b text-gray-900 border-gray-500 text-sm leading-5">+880 {{blood.donor_mobile_no}}</td>
                             <td class="px-6 py-4 whitespace-no-wrap border-b text-gray-900 border-gray-500 text-sm leading-none">{{blood.donation_date}}</td>
+                            <td class="px-6 py-4 whitespace-no-wrap border-b text-gray-900 border-gray-500 text-sm leading-none"> {{blood.expiry_date}} </td>
                         
                             <td class="px-6 flex justify-center py-4 whitespace-no-wrap text-right text-sm leading-5">
                                 <div class="flex flex-1">
@@ -106,6 +110,15 @@
                                     </button>
 
                                     
+                                    <button onclick="window.location.href='/inventory/confirm-sell/{{blood.id}}'" id="submit" type="submit" class="flex justify-center items-center px-5 py-2 text-gray-700 rounded focus:outline-none bg-white shadow-md">
+                                        <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-bucket" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                                            <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
+                                            <path d="M19 9l-2 9a2 2.5 0 0 1 -2 2h-6a2 2.5 0 0 1 -2 -2l-2 -9z"></path>
+                                            <path d="M7 9a5 5 0 0 1 10 0"></path>
+                                         </svg>
+                                        Sell
+                                    </button>
+
                                     <button onclick="window.location.href='/inventory/delete/{{blood.id}}'" id="submit" type="submit" class="flex justify-center items-center px-5 py-2 text-gray-700 rounded focus:outline-none bg-white shadow-md">
                                         <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-trash" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
                                             <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>

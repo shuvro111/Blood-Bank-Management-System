@@ -45,6 +45,7 @@ class Donor(models.Model):
     date_of_birth = models.DateField(auto_now=False, auto_now_add=False, blank=True, null=True, help_text="YYYY/MM/DD - eg: 1998/02/27")
     nid_image = models.FileField(upload_to='static/assets/nid/%Y/%m/%d/', max_length=100, blank=True, null=True)
     is_donor = models.BooleanField(default=False, blank=True)
+    date_created = models.DateTimeField(default =timezone.now)
 
 
     def __str__(self):

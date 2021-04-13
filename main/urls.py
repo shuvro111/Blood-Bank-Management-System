@@ -15,4 +15,5 @@ urlpatterns = [
     path('success/', views.success, name = 'success'),
     path('dashboard/', views.dashboard, name = 'dashboard'),
     path('donors/', views.view__donors, name = 'view__donors'),
+    path('sort_by_nearest/', views.sort_by_nearest, name = 'sort_by_nearest'),
 ]

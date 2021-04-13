@@ -1,13 +1,14 @@
 from django.shortcuts import render, redirect
 from django.contrib import messages
 from django.core.paginator import Paginator
+from datetime import timedelta
 
 # Models
 from .models import *
 
 # Forms
 from main.forms import LoginForm
-from .forms import  AddBloodForm
+from .forms import  AddBloodForm, TransactionForm
 
 #decorators
 
@@ -107,19 +108,19 @@ def add__blood(request):
         if form.is_valid():
             blood_group = form.cleaned_data.get('blood_group')
             donor_name = form.cleaned_data.get('donor_name')
+            donor_address = form.cleaned_data.get('donor_address')
             donor_mobile_no = form.cleaned_data.get('donor_mobile_no')
             donation_date = form.cleaned_data.get('donation_date')
+            expiry_date = donation_date + timedelta(days=42)
 
-            
 
             #Bloodbank Obj
             bloodbank_id = request.session['bloodbank_id']
             blood_bank = Bloodbank.objects.filter(pk = bloodbank_id).first()
 
             #Blood Obj
-            new_blood = Inventory.objects.create(blood_bank = blood_bank, blood_group = blood_group, donor_name = donor_name, donor_mobile_no = donor_mobile_no, donation_date = donation_date,)
+            new_blood = Inventory.objects.create(blood_bank = blood_bank, blood_group = blood_group, donor_name = donor_name, donor_address = donor_address, donor_mobile_no = donor_mobile_no, donation_date = donation_date, expiry_date = expiry_date)
             new_blood.save()
-            print(new_blood.donation_date)
             messages.success(request, 'Blood Added Successfully')
             return redirect('/inventory')
 
@@ -154,7 +155,7 @@ def edit__blood(request,blood_id):
             return redirect('/inventory')
 
     else:
-        return render(request, 'main/add_blood.html', {'form' : form}) 
+        return render(request, 'main/edit_blood.html', {'form' : form}) 
 
 
 #Delete Blood
@@ -169,6 +170,37 @@ def delete__blood(request,blood_id):
         return redirect('/inventory')
 
     return render(request, 'main/delete_blood.html')
+
+
+#Sell Blood
+@login__required
+@is_operator
+def sell__blood(request,blood_id):
+    blood_obj = Inventory.objects.get(pk=blood_id)
+
+    form = TransactionForm(request.POST)
+
+    if request.method == "POST":
+        form = TransactionForm(request.POST)
+        
+        if form.is_valid():
+            buyer_name = form.cleaned_data.get('buyer_name')
+            buyer_address = form.cleaned_data.get('buyer_address')
+            buyer_mobile_no = form.cleaned_data.get('buyer_mobile_no')
+            selling_date = form.cleaned_data.get('selling_date')
+            donor_name = blood_obj.donor_name
+            donor_address = blood_obj.donor_address
+            donor_mobile_no = blood_obj.donor_mobile_no
+            donation_date = blood_obj.donation_date
+
+
+            new_transaction = Transaction.objects.create(buyer_name = buyer_name, buyer_address = buyer_address, buyer_mobile_no = buyer_mobile_no, donor_name = donor_name, donor_address = donor_address, donor_mobile_no = donor_mobile_no, selling_date = selling_date,  donation_date = donation_date)
+            new_transaction.save()
+            blood_obj.delete()
+            messages.success(request, 'Blood Sell Confirmed!')
+            return redirect('/inventory')
+
+    return render(request, 'main/sell_blood.html', {'form' : form})
     
 
 
