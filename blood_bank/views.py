@@ -201,13 +201,14 @@ def sell__blood(request,blood_id):
             buyer_address = form.cleaned_data.get('buyer_address')
             buyer_mobile_no = form.cleaned_data.get('buyer_mobile_no')
             selling_date = form.cleaned_data.get('selling_date')
+            blood_group = blood_obj.blood_group
             donor_name = blood_obj.donor_name
             donor_address = blood_obj.donor_address
             donor_mobile_no = blood_obj.donor_mobile_no
             donation_date = blood_obj.donation_date
 
 
-            new_transaction = Transaction.objects.create(buyer_name = buyer_name, buyer_address = buyer_address, buyer_mobile_no = buyer_mobile_no, donor_name = donor_name, donor_address = donor_address, donor_mobile_no = donor_mobile_no, selling_date = selling_date,  donation_date = donation_date)
+            new_transaction = Transaction.objects.create(blood_group = blood_group, buyer_name = buyer_name, buyer_address = buyer_address, buyer_mobile_no = buyer_mobile_no, donor_name = donor_name, donor_address = donor_address, donor_mobile_no = donor_mobile_no, selling_date = selling_date,  donation_date = donation_date)
             new_transaction.save()
             blood_obj.delete()
             messages.success(request, 'Blood Sell Confirmed!')

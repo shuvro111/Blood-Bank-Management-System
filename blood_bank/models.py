@@ -43,6 +43,7 @@ class Inventory(models.Model):
         verbose_name_plural = 'Inventory'
 
 class Transaction(models.Model):
+    blood_group = models.CharField(max_length=3, choices=BloodGroup_Choices, blank=True, null=True)
     buyer_name = models.CharField(max_length=50)
     buyer_address = models.CharField(max_length=254)
     mobile_no_pattern= RegexValidator(regex="^[0-9]{10}$", message="Entered mobile number isn't in a right format!")
