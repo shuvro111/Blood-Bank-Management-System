@@ -1,0 +1,214 @@
+
+
+
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>View Donors - Blood Bank Management System</title>
+    {% load static %}
+
+    <link rel="stylesheet" type="text/css" href="{% static 'css/style.css' %}">
+    <link rel="stylesheet" type="text/css" href="{% static 'css/custom.css' %}">
+
+    {% block scripts %}
+    <!-- Jquery CDN -->
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js" integrity="sha256-/xUj+3OJU5yExlq6GSYGSHk7tPXikynS7ogEvDej/m4=" crossorigin="anonymous"></script>
+
+
+    {% endblock %}
+</head>
+<body>
+
+    <div class="w-full flex flex-col justify-center items-center my-8">
+        <h1 class="text-left uppercase font-bold text-5xl">Expiry Details</h1>
+        <p class="text-left font-semibold text-xl">{{request.session.bloodbank_name}}</9>
+    </div>
+
+    {% if messages %}
+    <div class="bg-red-200 text-red-700 px-6 py-4 rounded-lg relative mb-5" role="alert" x-data="{ open: true }" x-show.transition="open">
+
+        {% for message in messages %}
+            {% if 'safe' in message.tags %}         
+                <div class="single-message">
+                    {{ message|safe }}
+                </div>
+            {% else %}
+                <div class="single-message">
+                    {{ message }}
+                </div>
+            {% endif %}
+        {% endfor %}
+    </div>
+    {% endif %}
+
+    <!-- component -->
+    <div class="w-full p-4">
+        <div class="align-middle rounded-tl-lg rounded-tr-lg inline-block w-full py-4 overflow-hidden bg-white shadow-lg px-12">
+            <div class="flex justify-between">
+                <div class="inline-flex border rounded w-7/12 px-2 lg:px-6 h-12 bg-transparent">
+                    <div class="flex flex-wrap items-stretch w-full h-full mb-6 relative">
+                        <div class="flex">
+                            <span class="flex items-center leading-normal bg-transparent rounded rounded-r-none border border-r-0 border-none lg:px-3 py-2 whitespace-no-wrap text-grey-dark text-sm">
+                                <svg width="18" height="18" class="w-4 lg:w-auto" viewBox="0 0 18 18" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                    <path d="M8.11086 15.2217C12.0381 15.2217 15.2217 12.0381 15.2217 8.11086C15.2217 4.18364 12.0381 1 8.11086 1C4.18364 1 1 4.18364 1 8.11086C1 12.0381 4.18364 15.2217 8.11086 15.2217Z" stroke="#455A64" stroke-linecap="round" stroke-linejoin="round" />
+                                    <path d="M16.9993 16.9993L13.1328 13.1328" stroke="#455A64" stroke-linecap="round" stroke-linejoin="round" />
+                                </svg>
+                            </span>
+                        </div>
+                        <input id="searchBox" type="text" placeholder="Search by Blood Group, Donor Name or Date" class="flex-shrink flex-grow flex-auto leading-normal tracking-wide w-px flex-1 border border-none border-l-0 rounded rounded-l-none px-3 relative focus:outline-none text-xxs lg:text-xs lg:text-base text-gray-500 font-thin" placeholder="Search">
+                    </div>
+                </div>
+
+            </div>
+        </div>
+        <div class="align-middle inline-block min-w-full shadow overflow-hidden bg-white shadow-dashboard p-8 rounded-bl-lg rounded-br-lg">
+            <table class="min-w-full">
+                {% csrf_token %}
+                <thead>
+                    <tr class="text-sm leading-4 text-red-700 text-left uppercase tracking-wider border-gray-300">
+                        <th class="px-6 py-3 border-b-2">Blood Group</th>
+                        <th class="px-6 py-3 border-b-2">Donor Name</th>
+                        <th class="px-6 py-3 border-b-2">Donor's Address</th>
+                        <th class="px-6 py-3 border-b-2">Donor's Mobile No.</th>
+                        <th class="px-6 py-3 border-b-2">Donation Date</th>
+                        <th class="px-6 py-3 border-b-2">Expiry Date</th>
+                        <th class="px-6 py-3 border-b-2">Action</th>
+                    </tr>
+                </thead>
+                <tbody id="tbody" class="bg-white">
+                    {% for blood in page_obj %}
+                        <tr class="border-b border-gray-500">
+                            <td class="px-6 py-4 whitespace-no-wrap">
+                                <div class="text-sm leading-5 text-gray-900">{{blood.blood_group}}</div>
+                            </td>
+                            <td class="px-6 py-4 whitespace-no-wrap border-b text-gray-900 border-gray-500 text-sm leading-5">{{blood.donor_name}}</td>
+                            <td class="px-6 py-4 whitespace-no-wrap border-b text-gray-900 border-gray-500 text-sm leading-none"> {{blood.donor_address}} </td>
+                            <td class="px-6 py-4 whitespace-no-wrap border-b text-gray-900 border-gray-500 text-sm leading-5">+880 {{blood.donor_mobile_no}}</td>
+                            <td class="px-6 py-4 whitespace-no-wrap border-b text-gray-900 border-gray-500 text-sm leading-none">{{blood.donation_date}}</td>
+                            <td class="px-6 py-4 whitespace-no-wrap border-b text-gray-900 border-gray-500 text-sm leading-none"> {{blood.expiry_date}} </td>
+                        
+                            <td class="px-6 flex justify-center py-4 whitespace-no-wrap text-right text-sm leading-5">
+                                <div class="flex flex-1">
+                                    <button onclick="window.location.href='/inventory/edit/{{blood.id}}'" id="submit" type="button" class="flex mr-4 justify-center items-center px-5 py-2 text-gray-700 rounded focus:outline-none bg-white shadow-md">
+                                        <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-edit" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                                            <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
+                                            <path d="M9 7h-3a2 2 0 0 0 -2 2v9a2 2 0 0 0 2 2h9a2 2 0 0 0 2 -2v-3"></path>
+                                            <path d="M9 15h3l8.5 -8.5a1.5 1.5 0 0 0 -3 -3l-8.5 8.5v3"></path>
+                                            <line x1="16" y1="5" x2="19" y2="8"></line>
+                                            </svg>
+                                        Edit
+                                    </button>
+
+                                    
+                                    <button onclick="window.location.href='/inventory/confirm-sell/{{blood.id}}'" id="submit" type="submit" class="flex justify-center items-center px-5 py-2 text-gray-700 rounded focus:outline-none bg-white shadow-md">
+                                        <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-bucket" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                                            <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
+                                            <path d="M19 9l-2 9a2 2.5 0 0 1 -2 2h-6a2 2.5 0 0 1 -2 -2l-2 -9z"></path>
+                                            <path d="M7 9a5 5 0 0 1 10 0"></path>
+                                         </svg>
+                                        Sell
+                                    </button>
+
+                                    <button onclick="window.location.href='/inventory/delete/{{blood.id}}'" id="submit" type="submit" class="flex justify-center items-center px-5 py-2 text-gray-700 rounded focus:outline-none bg-white shadow-md">
+                                        <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-trash" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                                            <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
+                                            <line x1="4" y1="7" x2="20" y2="7"></line>
+                                            <line x1="10" y1="11" x2="10" y2="17"></line>
+                                            <line x1="14" y1="11" x2="14" y2="17"></line>
+                                            <path d="M5 7l1 12a2 2 0 0 0 2 2h8a2 2 0 0 0 2 -2l1 -12"></path>
+                                            <path d="M9 7v-3a1 1 0 0 1 1 -1h4a1 1 0 0 1 1 1v3"></path>
+                                            </svg>
+                                        Delete
+                                    </button>
+                                </div>
+                            </td>                        
+                        
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+
+
+            <!-- Pagination Start -->
+                <div class="sm:flex-1 sm:flex sm:items-center sm:justify-between mt-4 work-sans">
+                    <div>
+                        <p class="text-sm leading-5 text-red-700">
+                            Showing
+                            <span class="font-medium">{{pagination_info.start_result}}</span>
+                            to
+                            <span class="font-medium">{{pagination_info.end_result}}</span>
+                            of
+                            <span class="font-medium">{{pagination_info.total_items}}</span>
+                            results
+                        </p>
+                    </div>
+
+                    <!-- Pagination Link Start -->
+
+                    <div>
+                        <nav class="relative flex items-center shadow-sm">
+                                {% if page_obj.has_previous %}
+                                <div>
+                                    <a href="{% url 'view__inventory' %}?page=1" class="-ml-px relative  items-center px-4 py-2 border  bg-white text-sm leading-5 font-medium text-gray-700 focus:z-10 focus:outline-none focus:border-blue-300 focus:shadow-outline-blue active:bg-tertiary active:text-gray-700 transition ease-in-out duration-150 hover:bg-tertiary">
+                                        First
+                                    </a>
+                                </div>
+                                <div>
+                                    <a href="{% url 'view__inventory' %}?page={{page_obj.previous_page_number}}" class="relative inline-flex items-center px-2 py-2  border  bg-white text-sm leading-5 font-medium text-gray-500 hover:text-gray-400 focus:z-10 focus:outline-none focus:border-blue-300 focus:shadow-outline-blue active:bg-gray-100 active:text-gray-500 transition ease-in-out duration-150">
+                                        <svg class="h-5 w-5" viewBox="0 0 20 20" fill="#B91C1C">
+                                            <path fill-rule="evenodd" d="M12.707 5.293a1 1 0 010 1.414L9.414 10l3.293 3.293a1 1 0 01-1.414 1.414l-4-4a1 1 0 010-1.414l4-4a1 1 0 011.414 0z" clip-rule="evenodd" />
+                                        </svg>
+                                    </a>
+                                </div>
+                                {% endif %}
+
+                            {% for page_number in page_obj.paginator.page_range %}
+                                <div>
+
+                                    {% if page_number == page_obj.number %}
+                                        <a href="{% url 'view__inventory' %}?page={{page_number}}" class="-ml-px relative  items-center px-4 py-2 border  bg-red-900 text-sm leading-5 font-medium text-white focus:z-10 focus:outline-none focus:border-blue-300 focus:shadow-outline-blue active:bg-tertiary active:text-gray-700 transition ease-in-out duration-150 hover:bg-tertiary">
+                                            {{page_number}}
+                                        </a>
+
+                                    {% elif page_number > page_obj.number|add:'-3' and page_number < page_obj.number|add:'+3' %}
+                                        <a href="{% url 'view__inventory' %}?page={{page_number}}" class="-ml-px relative  items-center px-4 py-2 border  bg-white text-sm leading-5 font-medium text-gray-700 focus:z-10 focus:outline-none focus:border-blue-300 focus:shadow-outline-blue active:bg-tertiary active:text-gray-700 transition ease-in-out duration-150 hover:bg-tertiary">
+                                            {{page_number}}
+                                        </a>
+                                    {% endif %}
+
+                                </div>
+                            {% endfor %}
+
+                            
+                                {% if page_obj.has_next %}
+                                <div>
+                                    <a href="{% url 'view__inventory' %}?page={{page_obj.next_page_number}}" class="-ml-px relative inline-flex items-center px-2 py-2 rounded-r-md border  bg-white text-sm leading-5 font-medium text-gray-500 hover:text-gray-400 focus:z-10 focus:outline-none focus:border-blue-300 focus:shadow-outline-blue active:bg-gray-100 active:text-gray-500 transition ease-in-out duration-150">
+                                        <svg class="h-5 w-5" viewBox="0 0 20 20" fill="#B91C1C">
+                                            <path fill-rule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clip-rule="evenodd" />
+                                        </svg>
+                                    </a>
+                                </div>
+                                <div>
+                                    <a href="{% url 'view__inventory' %}?page={{page_obj.paginator.num_pages}}" class="-ml-px relative  items-center px-4 py-2 border  bg-white text-sm leading-5 font-medium text-gray-700 focus:z-10 focus:outline-none focus:border-blue-300 focus:shadow-outline-blue active:bg-tertiary active:text-gray-700 transition ease-in-out duration-150 hover:bg-tertiary">
+                                        Last
+                                    </a>
+                                </div>
+                                {% endif %}
+                        </nav>
+                    </div>
+                </div>
+        </div>            
+
+        <button onclick="window.location.href='/inventory/'" id="submit" type="button" class="bg-red-700 my-10 px-5 py-2 text-white rounded focus:outline-none">
+            Go Back to Inventory
+        </button> 
+
+    </div>
+
+
+</body>
+</html>

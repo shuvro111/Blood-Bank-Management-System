@@ -13,6 +13,7 @@ django-nucleus = "*"
 geopy = "*"
 geoip2 = "*"
 requests = "*"
+aiohttp = "*"
 
 [dev-packages]
 

@@ -29,12 +29,18 @@
     </div>
 
     {% if messages %}
-    <div class="bg-red-200 text-red-700 px-6 py-4 rounded-lg relative mb-5" role="alert" x-data="{ open: true }" x-show.transition="open">
+    <div class="w-max flex justify-center my-0 mx-auto bg-red-900 text-white px-6 py-4 rounded-lg relative mb-5" role="alert" x-data="{ open: true }" x-show.transition="open">
 
         {% for message in messages %}
-            <div class="single-message">
-                {{ message }}
-            </div>
+            {% if 'safe' in message.tags %}         
+                <div class="single-message">
+                    {{ message|safe }}
+                </div>
+            {% else %}
+                <div class="single-message">
+                    {{ message }}
+                </div>
+            {% endif %}
         {% endfor %}
     </div>
     {% endif %}
@@ -139,18 +145,15 @@
             </table>
 
             <!-- Pagination Start -->
-            <h1>{{ is_paginated }}</h1>
-            {% if is_paginated %}
-                <h1>{{ page_obj.has_previous }}</h1>
                 <div class="sm:flex-1 sm:flex sm:items-center sm:justify-between mt-4 work-sans">
                     <div>
                         <p class="text-sm leading-5 text-red-700">
                             Showing
-                            <span class="font-medium">1</span>
+                            <span class="font-medium">{{pagination_info.start_result}}</span>
                             to
-                            <span class="font-medium">200</span>
+                            <span class="font-medium">{{pagination_info.end_result}}</span>
                             of
-                            <span class="font-medium">2000</span>
+                            <span class="font-medium">{{pagination_info.total_items}}</span>
                             results
                         </p>
                     </div>
@@ -158,38 +161,57 @@
                     <!-- Pagination Link Start -->
 
                     <div>
-                        <nav class="relative z-0 inline-flex shadow-sm">
-                            <div	>
-                                <a href="#" class="relative inline-flex items-center px-2 py-2 rounded-l-md border  bg-white text-sm leading-5 font-medium text-gray-500 hover:text-gray-400 focus:z-10 focus:outline-none focus:border-blue-300 focus:shadow-outline-blue active:bg-gray-100 active:text-gray-500 transition ease-in-out duration-150" aria-label="Previous" v-on:click.prevent="changePage(pagination.current_page - 1)">
-                                    <svg class="h-5 w-5" viewBox="0 0 20 20" fill="#B91C1C">
-                                        <path fill-rule="evenodd" d="M12.707 5.293a1 1 0 010 1.414L9.414 10l3.293 3.293a1 1 0 01-1.414 1.414l-4-4a1 1 0 010-1.414l4-4a1 1 0 011.414 0z" clip-rule="evenodd" />
-                                    </svg>
-                                </a>
-                            </div>
-                            <div>
-                                <a href="#" class="-ml-px relative inline-flex items-center px-4 py-2 border  bg-white text-sm leading-5 font-medium text-gray-700 focus:z-10 focus:outline-none focus:border-blue-300 focus:shadow-outline-blue active:bg-tertiary active:text-gray-700 transition ease-in-out duration-150 hover:bg-tertiary">
-                                    1
-                                </a>
-                            <a href="#" class="-ml-px relative inline-flex items-center px-4 py-2 border  bg-white text-sm leading-5 font-medium text-gray-600 focus:z-10 focus:outline-none focus:border-blue-300 focus:shadow-outline-blue active:bg-tertiary active:text-gray-700 transition ease-in-out duration-150 hover:bg-tertiary">
-                                    2
-                                </a>
-                            <a href="#" class="-ml-px relative inline-flex items-center px-4 py-2 border  bg-white text-sm leading-5 font-medium text-gray-600 focus:z-10 focus:outline-none focus:border-blue-300 focus:shadow-outline-blue active:bg-tertiary active:text-gray-700 transition ease-in-out duration-150 hover:bg-tertiary">
-                                    3
-                                </a>
-                            </div>
-                            <div v-if="pagination.current_page < pagination.last_page">
-                                <a href="#" class="-ml-px relative inline-flex items-center px-2 py-2 rounded-r-md border  bg-white text-sm leading-5 font-medium text-gray-500 hover:text-gray-400 focus:z-10 focus:outline-none focus:border-blue-300 focus:shadow-outline-blue active:bg-gray-100 active:text-gray-500 transition ease-in-out duration-150" aria-label="Next">
-                                    <svg class="h-5 w-5" viewBox="0 0 20 20" fill="#B91C1C">
-                                        <path fill-rule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clip-rule="evenodd" />
-                                    </svg>
-                                </a>
-                            </div>
+                        <nav class="relative flex items-center shadow-sm">
+                                {% if page_obj.has_previous %}
+                                <div>
+                                    <a href="{% url 'expiry__details' %}?page=1" class="-ml-px relative  items-center px-4 py-2 border  bg-white text-sm leading-5 font-medium text-gray-700 focus:z-10 focus:outline-none focus:border-blue-300 focus:shadow-outline-blue active:bg-tertiary active:text-gray-700 transition ease-in-out duration-150 hover:bg-tertiary">
+                                        First
+                                    </a>
+                                </div>
+                                <div>
+                                    <a href="{% url 'expiry__details' %}?page={{page_obj.previous_page_number}}" class="relative inline-flex items-center px-2 py-2  border  bg-white text-sm leading-5 font-medium text-gray-500 hover:text-gray-400 focus:z-10 focus:outline-none focus:border-blue-300 focus:shadow-outline-blue active:bg-gray-100 active:text-gray-500 transition ease-in-out duration-150">
+                                        <svg class="h-5 w-5" viewBox="0 0 20 20" fill="#B91C1C">
+                                            <path fill-rule="evenodd" d="M12.707 5.293a1 1 0 010 1.414L9.414 10l3.293 3.293a1 1 0 01-1.414 1.414l-4-4a1 1 0 010-1.414l4-4a1 1 0 011.414 0z" clip-rule="evenodd" />
+                                        </svg>
+                                    </a>
+                                </div>
+                                {% endif %}
+
+                            {% for page_number in page_obj.paginator.page_range %}
+                                <div>
+
+                                    {% if page_number == page_obj.number %}
+                                        <a href="{% url 'expiry__details' %}?page={{page_number}}" class="-ml-px relative  items-center px-4 py-2 border  bg-red-900 text-sm leading-5 font-medium text-white focus:z-10 focus:outline-none focus:border-blue-300 focus:shadow-outline-blue active:bg-tertiary active:text-gray-700 transition ease-in-out duration-150 hover:bg-tertiary">
+                                            {{page_number}}
+                                        </a>
+
+                                    {% elif page_number > page_obj.number|add:'-3' and page_number < page_obj.number|add:'+3' %}
+                                        <a href="{% url 'expiry__details' %}?page={{page_number}}" class="-ml-px relative  items-center px-4 py-2 border  bg-white text-sm leading-5 font-medium text-gray-700 focus:z-10 focus:outline-none focus:border-blue-300 focus:shadow-outline-blue active:bg-tertiary active:text-gray-700 transition ease-in-out duration-150 hover:bg-tertiary">
+                                            {{page_number}}
+                                        </a>
+                                    {% endif %}
+
+                                </div>
+                            {% endfor %}
+
+                            
+                                {% if page_obj.has_next %}
+                                <div>
+                                    <a href="{% url 'expiry__details' %}?page={{page_obj.next_page_number}}" class="-ml-px relative inline-flex items-center px-2 py-2 rounded-r-md border  bg-white text-sm leading-5 font-medium text-gray-500 hover:text-gray-400 focus:z-10 focus:outline-none focus:border-blue-300 focus:shadow-outline-blue active:bg-gray-100 active:text-gray-500 transition ease-in-out duration-150">
+                                        <svg class="h-5 w-5" viewBox="0 0 20 20" fill="#B91C1C">
+                                            <path fill-rule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clip-rule="evenodd" />
+                                        </svg>
+                                    </a>
+                                </div>
+                                <div>
+                                    <a href="{% url 'expiry__details' %}?page={{page_obj.paginator.num_pages}}" class="-ml-px relative  items-center px-4 py-2 border  bg-white text-sm leading-5 font-medium text-gray-700 focus:z-10 focus:outline-none focus:border-blue-300 focus:shadow-outline-blue active:bg-tertiary active:text-gray-700 transition ease-in-out duration-150 hover:bg-tertiary">
+                                        Last
+                                    </a>
+                                </div>
+                                {% endif %}
                         </nav>
                     </div>
                 </div>
-
-            {% endif %}
-
         </div>
     </div>
 

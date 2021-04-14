@@ -1,7 +1,7 @@
 from django.shortcuts import render, redirect
 from django.contrib import messages
-from django.core.paginator import Paginator
-from datetime import timedelta
+from django.core.paginator import Paginator, EmptyPage
+from datetime import *
 
 # Models
 from .models import *
@@ -82,18 +82,31 @@ def view__inventory(request):
     bloodbank_id = request.session['bloodbank_id']
     inventory = Inventory.objects.filter(blood_bank_id = bloodbank_id).order_by('-donation_date')
 
-    paginator = Paginator(inventory, 15) # Show 25 contacts per page.
+    GetNotification.notify(request)
+    
+
+    paginator = Paginator(inventory, 15) # Show 15 contacts per page.
     page_number = request.GET.get('page', 1)
+
+    
+
     try:
         page_obj = paginator.page(page_number)
     except EmptyPage:
-        page_obj = paginator.page(1)
-     #get single page results
-    total_items = paginator.count
-    single_page_items = page_obj.count
+        page_number = 1
+        page_obj = paginator.page(page_number)
+
+    print(page_obj.has_previous())
+
+    pagination_info = {
+        'total_items' : paginator.count,
+        'start_result': 1 + (15 * (int(page_number) - 1)),
+        'end_result': (15 * int(page_number)) if paginator.count >= 15 else paginator.count,
+        'page_number' : page_number,
+    }
 
 
-    return render(request, 'main/view_inventory.html', {'page_obj' : page_obj})
+    return render(request, 'main/view_inventory.html', {'page_obj' : page_obj, 'pagination_info': pagination_info})
 
 
 # Add Blood
@@ -201,8 +214,32 @@ def sell__blood(request,blood_id):
             return redirect('/inventory')
 
     return render(request, 'main/sell_blood.html', {'form' : form})
+
+
+#expiry details
+def expiry__details(request):
+    expiring_bloods = GetNotification.get_expiring_bloods(request)
+    
+    paginator = Paginator(expiring_bloods, 15) # Show 15 contacts per page.
+    page_number = request.GET.get('page', 1)
+
     
 
+    try:
+        page_obj = paginator.page(page_number)
+    except EmptyPage:
+        page_number = 1
+        page_obj = paginator.page(page_number)
+
+    pagination_info = {
+        'total_items' : paginator.count,
+        'start_result': 1 + (15 * (int(page_number) - 1)),
+        'end_result': (15 * int(page_number)) if paginator.count >= 15 and paginator.count > (15 * int(page_number)) else paginator.count,
+        'page_number' : page_number,
+    }
+
+
+    return render(request, 'main/expiry_details.html', {'page_obj' : page_obj, 'pagination_info': pagination_info})
 
 
 # Functions
@@ -212,3 +249,39 @@ def set_session(request, bloodbank_id, bloodbank_name, operator_email, is_operat
     request.session['bloodbank_name'] = bloodbank_name
     request.session['operator_email'] = operator_email
     request.session['is_operator'] = is_operator
+
+
+class GetNotification():
+    
+    def notify(request):
+        bloodbank_id = request.session['bloodbank_id']
+        inventory = Inventory.objects.filter(blood_bank_id = bloodbank_id).order_by('-donation_date')
+        current_date = date.today().day;
+        has_expiring_blood = False
+        for blood in inventory:
+            expiry_date = blood.expiry_date.day
+            remaining_days = expiry_date - current_date
+            
+            if(remaining_days == 0):
+                blood.delete()
+                notification = 'One or more blood group has been removed as they are expired'
+                messages.success(request,notification )
+
+            if remaining_days in range(1,8) and not has_expiring_blood:
+                notification = 'One ore more blood group(s) are about to be expired' +' <a href="/inventory/expirydetails" class="ml-4 underline"> See details</a>'
+                messages.success(request, notification, extra_tags='safe')
+                has_expiring_blood = True
+    
+    def get_expiring_bloods(request):
+        bloodbank_id = request.session['bloodbank_id']
+        inventory = Inventory.objects.filter(blood_bank_id = bloodbank_id).order_by('-donation_date')
+        current_date = date.today().day;
+        expiring_blood_groups = []
+        for blood in inventory:
+            expiry_date = blood.expiry_date.day
+            remaining_days = expiry_date - current_date
+            
+            if remaining_days in range(1,8):                
+                expiring_blood_groups.append(blood)
+
+        return expiring_blood_groups

@@ -12,6 +12,7 @@ urlpatterns = [
     path('inventory/edit/<int:blood_id>', views.edit__blood, name = 'edit__blood'),
     path('inventory/delete/<int:blood_id>', views.delete__blood, name = 'delete__blood'),
     path('inventory/confirm-sell/<int:blood_id>', views.sell__blood, name = 'sell__blood'),
+    path('inventory/expirydetails', views.expiry__details, name = 'expiry__details'),
 ]
 
 

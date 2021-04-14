@@ -2,8 +2,6 @@ from django.shortcuts import render, redirect
 from django.contrib import messages
 from django.shortcuts import get_list_or_404, get_object_or_404
 import uuid
-import socket
-
 # Send Mail
 from django.conf import settings
 from django.core.mail import send_mail
@@ -19,9 +17,11 @@ from bookmark.models import *
 from .forms import UserForm, LoginForm, UserUpdateForm, DonorUpdateForm
 
 #geolocation
-from .utils import get_location, get_destination, get_distance
-import requests
+from .utils import get_location, get_destination, sort_nearest
+import requests, asyncio, aiohttp
+from asgiref.sync import sync_to_async
 
+from django.core.paginator import Paginator, EmptyPage
 
 
 # Decorators
@@ -36,9 +36,6 @@ def login__required(f):
     wrap.__doc__=f.__doc__
     wrap.__name__=f.__name__
     return wrap
-
-
-
 
 
 # Views
@@ -240,33 +237,29 @@ def view__donors(request):
 @login__required
 def sort_by_nearest(request):
 
-    #get donors
-    donors = Donor.objects.all()
-    distances = {}
-    #get ip from socket module
-    hostname = socket.gethostname()
-    #ip_address = socket.gethostbyname(hostname)
-    my_ip_address = '103.54.150.241'
+    results =  sort_nearest()
 
-    #get user location by ip_address
-    location = get_location(my_ip_address)
+    paginator = Paginator(results, 15) # Show 15 contacts per page.
+    page_number = request.GET.get('page', 1)
+
     
-    for donor in donors:
-        #get donors location by city
-        city = donor.city
-        destination = get_destination(city)
 
-        #find distance from user --> donor
-        response = requests.get("https://api.distancematrix.ai/maps/api/distancematrix/json?origins=23.8759,90.3795&destinations=Rangpur, Dhaka, Bangladesh&key=040gMYB28CrmN0oCgVtDawyZLdfIJ")
-        data = response.json()
-        distance = data['rows'][0]['elements'][0]['distance']['text']
-        print(distance)
-        # distances[donor].append(distance)
+    try:
+        page_obj = paginator.page(page_number)
+    except EmptyPage:
+        page_number = 1
+        page_obj = paginator.page(page_number)
+        
 
-    # distances.sort()
-    print(distances)
-    distances.clear()
-    return render(request, 'main/view_donors.html', {'distances': distances})
+    pagination_info = {
+        'total_items' : paginator.count,
+        'start_result': 1 + (15 * (int(page_number) - 1)),
+        'end_result': (15 * int(page_number)) if paginator.count >= 15 and paginator.count > (15 * int(page_number)) else paginator.count,
+        'page_number' : page_number,
+    }
+
+
+    return render(request, 'main/sort_by_nearest.html', {'results': results, 'page_obj' : page_obj, 'pagination_info': pagination_info})
 
 def token__send(request):
     return render(request, 'main/token.html')

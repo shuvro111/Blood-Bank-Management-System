@@ -2,6 +2,7 @@ from django.contrib import admin
 from django.urls import path, include
 
 from . import views
+from . import admin
 
 urlpatterns = [
     path('', views.index, name = 'index'),
@@ -16,4 +17,5 @@ urlpatterns = [
     path('dashboard/', views.dashboard, name = 'dashboard'),
     path('donors/', views.view__donors, name = 'view__donors'),
     path('sort_by_nearest/', views.sort_by_nearest, name = 'sort_by_nearest'),
+    path('generate_report/', admin.generate_report, name = 'generate_report'),
 ]

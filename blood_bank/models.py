@@ -38,6 +38,9 @@ class Inventory(models.Model):
 
     def __str__(self):
         return self.donor_name
+    
+    class Meta:
+        verbose_name_plural = 'Inventory'
 
 class Transaction(models.Model):
     buyer_name = models.CharField(max_length=50)
