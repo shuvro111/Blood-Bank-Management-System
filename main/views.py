@@ -9,16 +9,18 @@ from django.core.mail import send_mail
 #Hashing & Salting
 from passlib.hash import pbkdf2_sha256
 
-#Models
+# Models
 from .models import *
 from bookmark.models import *
 
 # Forms
 from .forms import UserForm, LoginForm, UserUpdateForm, DonorUpdateForm
 
-#geolocation
+# geolocation
 from .utils import get_location, get_destination, sort_nearest
-import requests, asyncio, aiohttp
+import requests
+import asyncio
+import aiohttp
 from asgiref.sync import sync_to_async
 
 from django.core.paginator import Paginator, EmptyPage
@@ -28,13 +30,13 @@ from django.core.paginator import Paginator, EmptyPage
 
 def login__required(f):
     def wrap(request, *args, **kwargs):
-        #this check the session if userid key exist, if not it will redirect to login page
+        # this check the session if userid key exist, if not it will redirect to login page
         if 'email' not in request.session.keys():
             messages.error(request, 'You are not logged in :/')
             return redirect("/login")
         return f(request, *args, **kwargs)
-    wrap.__doc__=f.__doc__
-    wrap.__name__=f.__name__
+    wrap.__doc__ = f.__doc__
+    wrap.__name__ = f.__name__
     return wrap
 
 
@@ -46,7 +48,6 @@ def index(request):
         return render(request, 'main/index.html')
     else:
         return redirect('dashboard')
-
 
 
 def create__account(request):
@@ -71,26 +72,27 @@ def create__account(request):
             date_of_birth = form.cleaned_data.get('date_of_birth')
             nid_image = form.cleaned_data.get('nid_image')
             is_donor = form.cleaned_data.get('is_donor')
-
-            print("is donor is", is_donor)
+            is_available = form.cleaned_data.get('is_available')
 
             auth_token = str(uuid.uuid4())
 
-            #Check if account exists
+            # Check if account exists
             user_obj = User.objects.filter(email=email).first()
 
             if user_obj:
                 messages.error(request, 'This email is already registered')
                 return redirect('/token')
             else:
-                new__user = User.objects.create(user_name=user_name, email=email, password=hashed_password, auth_token=auth_token)
+                new__user = User.objects.create(
+                    user_name=user_name, email=email, password=hashed_password, auth_token=auth_token)
 
                 if is_donor:
-                    new__donor = Donor.objects.create(is_donor = is_donor, user = new__user, city=city, mobile_no=mobile_no, blood_group=blood_group, gender=gender, date_of_birth=date_of_birth, nid_image=nid_image)
+                    new__donor = Donor.objects.create(is_donor=is_donor, user=new__user, city=city, mobile_no=mobile_no,
+                                                      blood_group=blood_group, gender=gender, date_of_birth=date_of_birth, nid_image=nid_image, is_available=is_available)
                     new__donor.save()
                 else:
                     new__user.save()
-   
+
                 registration_mail(email, auth_token)
                 return redirect('/token')
         else:
@@ -111,52 +113,52 @@ def log__in(request):
             form = LoginForm(request.POST)
 
             if form.is_valid():
-                #Form Data
+                # Form Data
                 email = form.cleaned_data.get('email')
                 password = form.cleaned_data.get('password')
-                
-                #User Object from database
+
+                # User Object from database
                 user_obj = User.objects.filter(email=email).first()
 
-                #Check If User Exists
+                # Check If User Exists
                 if user_obj is None:
                     messages.error(request, 'User not found.')
                     return redirect('/login')
 
-                
                 if user_obj:
 
-                    #Check Verified User
+                    # Check Verified User
 
                     if not user_obj.is_verified:
-                        messages.error(request, 'Profile is not verified check your mail.')
+                        messages.error(
+                            request, 'Profile is not verified check your mail.')
                         return redirect('/login')
-                        
-                    #Check Password
-                    hashed_password = user_obj.password
-                    is_valid_user = pbkdf2_sha256.verify(password, hashed_password)
 
-                    #Case: Invalid Password
+                    # Check Password
+                    hashed_password = user_obj.password
+                    is_valid_user = pbkdf2_sha256.verify(
+                        password, hashed_password)
+
+                    # Case: Invalid Password
                     if not is_valid_user:
                         messages.error(request, 'Wrong password!')
                         return redirect('/login')
-                    else:                  
-                        #check if donor or user
+                    else:
+                        # check if donor or user
                         is_donor = hasattr(user_obj, 'donor')
 
                         if is_donor:
-                            #set_session / authorized login
-                            set_session(request, user_obj.id, user_obj.user_name, user_obj.email, 'true')
+                            # set_session / authorized login
+                            set_session(
+                                request, user_obj.id, user_obj.user_name, user_obj.email, 'true')
                         else:
-                            #set_session / authorized login
-                            set_session(request, user_obj.id, user_obj.user_name, user_obj.email, 'false')
+                            # set_session / authorized login
+                            set_session(
+                                request, user_obj.id, user_obj.user_name, user_obj.email, 'false')
 
                         return redirect('/dashboard')
 
-
-                
-
-        return render(request, 'main/log__in.html', {'form' : form})
+        return render(request, 'main/log__in.html', {'form': form})
 
 
 @login__required
@@ -167,20 +169,20 @@ def log__out(request):
 
 @login__required
 def edit__profile(request):
-    
+
     id = request.session['user_id']
     # user_obj = get_object_or_404(User, pk=id)
     user_obj = User.objects.get(pk=id)
     is_donor = hasattr(user_obj, 'donor')
 
-    form = UserUpdateForm(request.POST or None, instance = user_obj)
+    form = UserUpdateForm(request.POST or None, instance=user_obj)
     if is_donor:
-        donor_obj = Donor.objects.filter(user = user_obj).first()
-        print(donor_obj.user_id)
-        donor_form = DonorUpdateForm(request.POST or None, instance = donor_obj)
+        donor_obj = Donor.objects.filter(user=user_obj).first()
+        print(donor_obj.is_available)
+        donor_form = DonorUpdateForm(request.POST or None, instance=donor_obj)
+        # print(donor_form.is_available)
 
     if request.method == "POST":
-        
 
         if form.is_valid():
             print("Form is valid")
@@ -189,77 +191,87 @@ def edit__profile(request):
             user_obj.save()
 
     if request.method == "POST":
-        print("POST METHOD Received")
         if is_donor:
             print(donor_form.errors)
             if donor_form.is_valid():
 
-                
                 city = donor_form.cleaned_data.get('city')
                 mobile_no = donor_form.cleaned_data.get('mobile_no')
                 gender = donor_form.cleaned_data.get('gender')
                 date_of_birth = donor_form.cleaned_data.get('date_of_birth')
+                is_available = donor_form.cleaned_data.get('is_available')
 
-                # donor_obj.user = user_obj
-                print(city)
                 donor_obj.city = city
                 donor_obj.mobile_no = mobile_no
                 donor_obj.gender = gender
                 donor_obj.date_of_birth = date_of_birth
-                
+                donor_obj.is_available = is_available
                 donor_obj.save()
-                print('donor object saved')
-        
-        messages.success(request, 'Profile has been updated!') 
+
+                # print(donor_obj.is_available + 'Updated')
+
+        messages.success(request, 'Profile has been updated!')
         return redirect('/dashboard')
 
     else:
         if is_donor:
-            return render(request, 'main/edit_profile.html', {'form' : form, 'donor_form' : donor_form})
+            return render(request, 'main/edit_profile.html', {'form': form, 'donor_form': donor_form})
         else:
-            return render(request, 'main/edit_profile.html', {'form' : form})        
+            return render(request, 'main/edit_profile.html', {'form': form})
 
-    
+
 @login__required
 def view__donors(request):
     donors = Donor.objects.all()
-    
+
     id = request.session['user_id']
     user_obj = User.objects.get(pk=id)
-    bookmarks = Bookmark.objects.filter(client = user_obj)
+    bookmarks = Bookmark.objects.filter(client=user_obj)
 
-    # donor_id = request.POST['donor_id']
-    # donor_obj = Donor.objects.get(pk=donor_id)
-
-    return render(request, 'main/view_donors.html', {'donors' : donors, 'bookmarks' : bookmarks, 'bookmarked' : 'False'})
-
-
-@login__required
-def sort_by_nearest(request):
-
-    results =  sort_nearest()
-
-    paginator = Paginator(results, 15) # Show 15 contacts per page.
+    paginator = Paginator(donors, 15)  # Show 15 contacts per page.
     page_number = request.GET.get('page', 1)
-
-    
 
     try:
         page_obj = paginator.page(page_number)
     except EmptyPage:
         page_number = 1
         page_obj = paginator.page(page_number)
-        
 
     pagination_info = {
-        'total_items' : paginator.count,
+        'total_items': paginator.count,
         'start_result': 1 + (15 * (int(page_number) - 1)),
         'end_result': (15 * int(page_number)) if paginator.count >= 15 and paginator.count > (15 * int(page_number)) else paginator.count,
-        'page_number' : page_number,
+        'page_number': page_number,
     }
 
+    return render(request, 'main/view_donors.html', {'page_obj': page_obj, 'pagination_info': pagination_info, 'bookmarks': bookmarks})
 
-    return render(request, 'main/sort_by_nearest.html', {'results': results, 'page_obj' : page_obj, 'pagination_info': pagination_info})
+    # return render(request, 'main/view_donors.html', {'donors': donors, })
+
+
+@login__required
+def sort_by_nearest(request):
+
+    results = sort_nearest()
+
+    paginator = Paginator(results, 15)  # Show 15 contacts per page.
+    page_number = request.GET.get('page', 1)
+
+    try:
+        page_obj = paginator.page(page_number)
+    except EmptyPage:
+        page_number = 1
+        page_obj = paginator.page(page_number)
+
+    pagination_info = {
+        'total_items': paginator.count,
+        'start_result': 1 + (15 * (int(page_number) - 1)),
+        'end_result': (15 * int(page_number)) if paginator.count >= 15 and paginator.count > (15 * int(page_number)) else paginator.count,
+        'page_number': page_number,
+    }
+
+    return render(request, 'main/sort_by_nearest.html', {'results': results, 'page_obj': page_obj, 'pagination_info': pagination_info})
+
 
 def token__send(request):
     return render(request, 'main/token.html')
@@ -268,8 +280,10 @@ def token__send(request):
 def success(request):
     return render(request, 'main/success.html')
 
+
 def error_page(request):
     return render(request, 'main/error.html')
+
 
 @login__required
 def dashboard(request):
@@ -280,20 +294,19 @@ def dashboard(request):
 
 # Functions
 
+
 def registration_mail(email, token):
     subject = 'Your accounts need to be verified'
     message = f'Hi paste the link http://127.0.0.1:8000/verify/{token} or click on the link to verify your account'
-
 
     email_from = settings.EMAIL_HOST_USER
     recipient_list = [email]
     send_mail(subject, message, email_from, recipient_list)
 
 
-def verify(request , auth_token):
+def verify(request, auth_token):
     try:
-        user_obj = User.objects.filter(auth_token = auth_token).first()
-    
+        user_obj = User.objects.filter(auth_token=auth_token).first()
 
         if user_obj:
             if user_obj.is_verified:
@@ -315,4 +328,3 @@ def set_session(request, user_id, user_name, email, donor_status):
     request.session['user_name'] = user_name
     request.session['email'] = email
     request.session['is_donor'] = donor_status
-

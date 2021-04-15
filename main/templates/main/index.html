@@ -23,6 +23,7 @@
     <!-- Tailwind css -->
     <link rel="stylesheet" href="/build/tailwind.css" type="text/css" media="screen" title="no title" charset="utf-8" />
     <link rel="stylesheet" type="text/css" href="{% static 'css/tailwind.css'%}">
+    <link href="https://unpkg.com/tailwindcss@^2/dist/tailwind.min.css" rel="stylesheet">
   </head>
   <body>
 
@@ -67,10 +68,10 @@
                       </ul>
                   </div>
                   <div class="header-btn hidden sm:block sm:absolute sm:right-0 sm:mr-16 lg:static lg:mr-0">
-                    <a class="text-blue-600 border border-blue-600 px-10 py-3 rounded-full duration-300 hover:bg-blue-600 hover:text-white" href="#feature">SignUp</a>
+                    <a class="text-blue-600 border border-blue-600 px-10 py-3 rounded-full duration-300 hover:bg-blue-600 hover:text-white" href="/create">SignUp</a>
                   </div>
                   <div class="ml-4 header-btn hidden sm:block sm:absolute sm:right-0 sm:mr-16 lg:static lg:mr-0">
-                    <a class="text-white border border-blue-600 px-10 py-3 bg-blue-600 rounded-full duration-300 hover:bg-blue-600 hover:text-white" href="#feature">Login</a>
+                    <a class="text-white border border-blue-600 px-10 py-3 bg-blue-600 rounded-full duration-300 hover:bg-blue-600 hover:text-white" href="/login">Login</a>
                   </div>
               </nav>
           </div>
