@@ -12,6 +12,7 @@ from passlib.hash import pbkdf2_sha256
 # Models
 from .models import *
 from bookmark.models import *
+from blood_bank.models import *
 
 # Forms
 from .forms import UserForm, LoginForm, UserUpdateForm, DonorUpdateForm
@@ -287,10 +288,12 @@ def error_page(request):
 
 @login__required
 def dashboard(request):
+    bloods = Inventory.objects.all()[:5]
+
     if request.session['is_donor'] == 'true':
-        return render(request, 'main/donor_dashboard.html')
+        return render(request, 'main/donor_dashboard.html', {'bloods': bloods})
     else:
-        return render(request, 'main/user_dashboard.html')
+        return render(request, 'main/user_dashboard.html', {'bloods': bloods})
 
 # Functions
 
