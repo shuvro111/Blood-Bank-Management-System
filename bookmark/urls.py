@@ -11,5 +11,4 @@ urlpatterns = [
          views.add__bookmarks, name='add__bookmarks'),
     path('removebookmarks/<int:donor_id>',
          views.remove__bookmarks, name='remove__bookmarks'),
-    # url(r'^addbookmarks$', views.add__bookmarks, name='add__bookmarks'),
 ]
