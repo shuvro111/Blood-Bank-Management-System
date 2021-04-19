@@ -18,7 +18,7 @@ BloodGroup_Choices = (
 # Create your models here.
 class Bloodbank(models.Model):
     name = models.CharField(max_length=50)
-    bloodbank_address = models.CharField(max_length=254)
+    bloodbank_address = models.CharField(max_length=254, null=True)
     operator_email = models.EmailField(max_length=50)
     operator_password = models.CharField(max_length=254)
     date_created = models.DateTimeField(default=timezone.now)
@@ -41,6 +41,7 @@ class Inventory(models.Model):
         auto_now=False, auto_now_add=False, blank=True, null=True, help_text="YYYY/MM/DD - eg: 1998-02-27")
     expiry_date = models.DateField(auto_now=False, auto_now_add=False,
                                    blank=True, null=True, help_text="YYYY/MM/DD - eg: 1998-02-27")
+    date_created = models.DateTimeField(default=timezone.now)
 
     def __str__(self):
         return self.donor_name

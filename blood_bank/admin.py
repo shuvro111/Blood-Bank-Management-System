@@ -61,6 +61,7 @@ class BloodbankAdmin(admin.ModelAdmin):
 class InventoryAdmin(admin.ModelAdmin):
     list_display = ('donor_name', 'donor_address',
                     'blood_group', 'donation_date', 'blood_bank')
+    list_filter = ('blood_bank', 'date_created',)
     actions = [generate_inventory_report]
 
 
