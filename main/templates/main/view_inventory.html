@@ -164,12 +164,12 @@
                         <nav class="relative flex items-center shadow-sm">
                                 {% if page_obj.has_previous %}
                                 <div>
-                                    <a href="{% url 'expiry__details' %}?page=1" class="-ml-px relative  items-center px-4 py-2 border  bg-white text-sm leading-5 font-medium text-gray-700 focus:z-10 focus:outline-none focus:border-blue-300 focus:shadow-outline-blue active:bg-tertiary active:text-gray-700 transition ease-in-out duration-150 hover:bg-tertiary">
+                                    <a href="{% url 'view__inventory' %}?page=1" class="-ml-px relative  items-center px-4 py-2 border  bg-white text-sm leading-5 font-medium text-gray-700 focus:z-10 focus:outline-none focus:border-blue-300 focus:shadow-outline-blue active:bg-tertiary active:text-gray-700 transition ease-in-out duration-150 hover:bg-tertiary">
                                         First
                                     </a>
                                 </div>
                                 <div>
-                                    <a href="{% url 'expiry__details' %}?page={{page_obj.previous_page_number}}" class="relative inline-flex items-center px-2 py-2  border  bg-white text-sm leading-5 font-medium text-gray-500 hover:text-gray-400 focus:z-10 focus:outline-none focus:border-blue-300 focus:shadow-outline-blue active:bg-gray-100 active:text-gray-500 transition ease-in-out duration-150">
+                                    <a href="{% url 'view__inventory' %}?page={{page_obj.previous_page_number}}" class="relative inline-flex items-center px-2 py-2  border  bg-white text-sm leading-5 font-medium text-gray-500 hover:text-gray-400 focus:z-10 focus:outline-none focus:border-blue-300 focus:shadow-outline-blue active:bg-gray-100 active:text-gray-500 transition ease-in-out duration-150">
                                         <svg class="h-5 w-5" viewBox="0 0 20 20" fill="#B91C1C">
                                             <path fill-rule="evenodd" d="M12.707 5.293a1 1 0 010 1.414L9.414 10l3.293 3.293a1 1 0 01-1.414 1.414l-4-4a1 1 0 010-1.414l4-4a1 1 0 011.414 0z" clip-rule="evenodd" />
                                         </svg>
@@ -181,12 +181,12 @@
                                 <div>
 
                                     {% if page_number == page_obj.number %}
-                                        <a href="{% url 'expiry__details' %}?page={{page_number}}" class="-ml-px relative  items-center px-4 py-2 border  bg-red-900 text-sm leading-5 font-medium text-white focus:z-10 focus:outline-none focus:border-blue-300 focus:shadow-outline-blue active:bg-tertiary active:text-gray-700 transition ease-in-out duration-150 hover:bg-tertiary">
+                                        <a href="{% url 'view__inventory' %}?page={{page_number}}" class="-ml-px relative  items-center px-4 py-2 border  bg-red-900 text-sm leading-5 font-medium text-white focus:z-10 focus:outline-none focus:border-blue-300 focus:shadow-outline-blue active:bg-tertiary active:text-gray-700 transition ease-in-out duration-150 hover:bg-tertiary">
                                             {{page_number}}
                                         </a>
 
                                     {% elif page_number > page_obj.number|add:'-3' and page_number < page_obj.number|add:'+3' %}
-                                        <a href="{% url 'expiry__details' %}?page={{page_number}}" class="-ml-px relative  items-center px-4 py-2 border  bg-white text-sm leading-5 font-medium text-gray-700 focus:z-10 focus:outline-none focus:border-blue-300 focus:shadow-outline-blue active:bg-tertiary active:text-gray-700 transition ease-in-out duration-150 hover:bg-tertiary">
+                                        <a href="{% url 'view__inventory' %}?page={{page_number}}" class="-ml-px relative  items-center px-4 py-2 border  bg-white text-sm leading-5 font-medium text-gray-700 focus:z-10 focus:outline-none focus:border-blue-300 focus:shadow-outline-blue active:bg-tertiary active:text-gray-700 transition ease-in-out duration-150 hover:bg-tertiary">
                                             {{page_number}}
                                         </a>
                                     {% endif %}
@@ -197,14 +197,14 @@
                             
                                 {% if page_obj.has_next %}
                                 <div>
-                                    <a href="{% url 'expiry__details' %}?page={{page_obj.next_page_number}}" class="-ml-px relative inline-flex items-center px-2 py-2 rounded-r-md border  bg-white text-sm leading-5 font-medium text-gray-500 hover:text-gray-400 focus:z-10 focus:outline-none focus:border-blue-300 focus:shadow-outline-blue active:bg-gray-100 active:text-gray-500 transition ease-in-out duration-150">
+                                    <a href="{% url 'view__inventory' %}?page={{page_obj.next_page_number}}" class="-ml-px relative inline-flex items-center px-2 py-2 rounded-r-md border  bg-white text-sm leading-5 font-medium text-gray-500 hover:text-gray-400 focus:z-10 focus:outline-none focus:border-blue-300 focus:shadow-outline-blue active:bg-gray-100 active:text-gray-500 transition ease-in-out duration-150">
                                         <svg class="h-5 w-5" viewBox="0 0 20 20" fill="#B91C1C">
                                             <path fill-rule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clip-rule="evenodd" />
                                         </svg>
                                     </a>
                                 </div>
                                 <div>
-                                    <a href="{% url 'expiry__details' %}?page={{page_obj.paginator.num_pages}}" class="-ml-px relative  items-center px-4 py-2 border  bg-white text-sm leading-5 font-medium text-gray-700 focus:z-10 focus:outline-none focus:border-blue-300 focus:shadow-outline-blue active:bg-tertiary active:text-gray-700 transition ease-in-out duration-150 hover:bg-tertiary">
+                                    <a href="{% url 'view__inventory' %}?page={{page_obj.paginator.num_pages}}" class="-ml-px relative  items-center px-4 py-2 border  bg-white text-sm leading-5 font-medium text-gray-700 focus:z-10 focus:outline-none focus:border-blue-300 focus:shadow-outline-blue active:bg-tertiary active:text-gray-700 transition ease-in-out duration-150 hover:bg-tertiary">
                                         Last
                                     </a>
                                 </div>

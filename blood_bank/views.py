@@ -277,18 +277,20 @@ class GetNotification():
         bloodbank_id = request.session['bloodbank_id']
         inventory = Inventory.objects.filter(
             blood_bank_id=bloodbank_id).order_by('-donation_date')
-        current_date = date.today().day
+        current_date = date.today()
+
         has_expiring_blood = False
         for blood in inventory:
-            expiry_date = blood.expiry_date.day
-            remaining_days = expiry_date - current_date
+            expiry_date = blood.expiry_date
+            remaining_days = (expiry_date - current_date).days
 
+            print(expiry_date)
             if(remaining_days == 0):
                 blood.delete()
                 notification = 'One or more blood group has been removed as they are expired'
                 messages.success(request, notification)
 
-            if remaining_days in range(1, 8) and not has_expiring_blood:
+            if remaining_days in range(1, 8) and has_expiring_blood == False:
                 notification = 'One ore more blood group(s) are about to be expired' + \
                     ' <a href="/inventory/expirydetails" class="ml-4 underline"> See details</a>'
                 messages.success(request, notification, extra_tags='safe')
