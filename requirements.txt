@@ -37,6 +37,7 @@ Django==3.1.6
 django-appconf==1.0.4
 django-classy-tags==2.0.0
 django-easy-maps==1.1.2
+django-nucleus==0.1.2
 dnspython==1.16.0
 docker==5.0.0
 docker-compose==1.29.0

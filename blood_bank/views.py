@@ -300,11 +300,11 @@ class GetNotification():
         bloodbank_id = request.session['bloodbank_id']
         inventory = Inventory.objects.filter(
             blood_bank_id=bloodbank_id).order_by('-donation_date')
-        current_date = date.today().day
+        current_date = date.today()
         expiring_blood_groups = []
         for blood in inventory:
-            expiry_date = blood.expiry_date.day
-            remaining_days = expiry_date - current_date
+            expiry_date = blood.expiry_date
+            remaining_days = (expiry_date - current_date).days
 
             if remaining_days in range(1, 8):
                 expiring_blood_groups.append(blood)
