@@ -208,8 +208,15 @@ def edit__profile(request):
                 donor_obj.date_of_birth = date_of_birth
                 donor_obj.is_available = is_available
                 donor_obj.save()
+        # Update set session
+        if is_donor:
+            set_session(
+                request, user_obj.id, user_obj.user_name, user_obj.email, 'true')
+        else:
+            set_session(
+                request, user_obj.id, user_obj.user_name, user_obj.email, 'false')
 
-                # print(donor_obj.is_available + 'Updated')
+        
 
         messages.success(request, 'Profile has been updated!')
         return redirect('/dashboard')
